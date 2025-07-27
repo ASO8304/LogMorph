@@ -18,8 +18,9 @@
 
 <h2 style="font-family: Vazirmatn, sans-serif;">📦 نصب و راه‌اندازی</h2>
 
-<h3>۱. نصب PostgreSQL و تنظیمات اولیه</h3>
-<pre><code>
+<h3 style="font-family: Vazirmatn, sans-serif;">۱. نصب PostgreSQL و تنظیمات اولیه</h3>
+
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
 # به‌روزرسانی لیست بسته‌ها و نصب PostgreSQL
 sudo apt update
 sudo apt install postgresql postgresql-contrib
@@ -49,7 +50,7 @@ exit
 # ویرایش فایل پیکربندی postgresql.conf برای فعال‌کردن اتصال ریموت
 sudo vim /etc/postgresql/*/main/postgresql.conf
 
-# خط زیر را پیدا کرده و حذف علامت # کنید یا مقدار آن را به '*' تغییر دهید
+# خط زیر را پیدا کرده و علامت # را حذف کرده یا مقدار آن را به '*' تغییر دهید
 listen_addresses = '*'
 
 # ویرایش فایل pg_hba.conf برای تعریف دسترسی‌ها
@@ -60,7 +61,7 @@ host    all             all             0.0.0.0/0               md5
 
 # راه‌اندازی مجدد PostgreSQL برای اعمال تغییرات
 sudo systemctl restart postgresql
-</code></pre>
+</pre>
 
 
 <h3>۲. نصب Logstash</h3>
