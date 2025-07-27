@@ -44,8 +44,10 @@ source venv/bin/activate
 pip install fastapi uvicorn[standard] sqlalchemy psycopg2 requests
 </code></pre>
 
-<h3>۵. ساخت فایل <code>app.py</code></h3>
-<p>در همین دایرکتوری پروژه، فایلی به نام <code>app.py</code> بسازید و کد FastAPI را در آن قرار دهید. این فایل وظیفه دریافت لاگ‌ها و ذخیره‌سازی در دیتابیس را دارد.</p>
+<h3>۵. کپی فایل <code>app.py</code> از دایرکتوری پروژه</h3>
+<p>اگر مخزن پروژه را کلون کرده‌اید، کافی است فایل <code>app.py</code> را به پوشه جاری کپی کنید:</p>
+<pre><code>cp ../logmorph/app.py .</code></pre>
+<p>توجه کنید مسیر <code>../logmorph/app.py</code> باید با مسیر واقعی فایل شما هماهنگ باشد.</p>
 
 <h3>۶. اجرای FastAPI</h3>
 <p><strong>توجه:</strong> <br> قبل از اجرای Logstash، حتما باید سرویس FastAPI را اجرا کنید تا لاگ‌ها به مقصد برسند.</p>
@@ -63,7 +65,8 @@ uvicorn app:app --host 0.0.0.0 --port 10000
 فایل کانفیگ <code>logmorph.conf</code> داخل پوشه پروژه قرار دارد. برای استفاده، آن را به مسیر اصلی Logstash کپی کنید:
 </p>
 
-<pre><code>sudo cp logmorph.conf /etc/logstash/conf.d/</code></pre>
+<pre><code>sudo cp ../logmorph/logmorph.conf /etc/logstash/conf.d/</code></pre>
+<p>توجه کنید مسیر <code>../logmorph/logmorph.conf</code> باید با مسیر واقعی فایل شما هماهنگ باشد.</p>
 
 <h3>۲. اجرای Logstash</h3>
 <pre><code>sudo systemctl restart logstash
@@ -71,8 +74,6 @@ sudo systemctl enable logstash
 </code></pre>
 
 <p><strong>توجه:</strong> حتما قبل از اجرای Logstash، FastAPI را با uvicorn اجرا کرده باشید.</p>
-
-<hr>
 
 <h2 style="font-family: Vazirmatn, sans-serif;">🚀 تست سیستم با فایل لاگ</h2>
 
@@ -123,10 +124,6 @@ echo "✅ Finished sending all logs."
 
 <h2 style="font-family: Vazirmatn, sans-serif;">🔍 بررسی لاگ‌های سرویس‌ها</h2>
 
-<h4>بررسی لاگ FastAPI:</h4>
-<pre><code>source venv/bin/activate
-uvicorn app:app --host 0.0.0.0 --port 10000
-</code></pre>
 
 <h4>بررسی لاگ Logstash:</h4>
 <pre><code>journalctl -u logstash -f</code></pre>
