@@ -35,8 +35,8 @@ GRANT ALL PRIVILEGES ON DATABASE logdb TO &lt;username&gt;;
 <h3>۳. ساخت دایرکتوری پروژه و ایجاد محیط مجازی Python (venv)</h3>
 <pre><code>mkdir logmorph
 cd logmorph
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv <venv_name>
+source <venv_name>/bin/activate
 </code></pre>
 
 <h3>۴. نصب کتابخانه‌های Python مورد نیاز در محیط مجازی</h3>
@@ -79,38 +79,16 @@ sudo systemctl enable logstash
 
 <h3>۱. ساخت فایل <code>mylogs.txt</code> با نمونه لاگ‌ها</h3>
 
-<pre><code>in_mac=aa:bb:cc:dd:ee:ff out_mac=ff:ee:dd:cc:bb:aa dir=in len=60 proto=6 src_ip=192.168.1.10 dst_ip=8.8.8.8 src_port=12345 dst_port=53 description=DNS_request
-in_mac=aa:bb:cc:dd:ee:11 out_mac=ff:ee:dd:cc:bb:22 dir=out len=74 proto=17 src_ip=10.0.0.1 dst_ip=192.168.1.100 src_port=5678 dst_port=443 description=TLS
-</code></pre>
+<h3>۲. کپی اسکریپت <code>simulate_logs.sh</code> از دایرکتوری پروژه و اجرای آن</h3>
 
-<h3>۲. ساخت اسکریپت <code>simulate_logs.sh</code> برای شبیه‌سازی ارسال لاگ</h3>
-<pre><code>#!/bin/bash
+<p>اگر مخزن پروژه را کلون کرده‌اید، کافی است فایل <code>simulate_logs.sh</code> را به پوشه جاری کپی کنید و مجوز اجرا بدهید:</p>
 
-LOG_FILE="mylogs.txt"
-HOST="localhost"
-PORT=5140
-
-if [ ! -f "$LOG_FILE" ]; then
-  echo "Log file not found: $LOG_FILE"
-  exit 1
-fi
-
-echo "📤 Starting log simulation to $HOST:$PORT..."
-
-while IFS= read -r line; do
-  socat - UDP4-DATAGRAM:$HOST:$PORT <<< "$line" > /dev/null 2>&1
-  echo "$line"
-  sleep 0.1
-done &lt; "$LOG_FILE"
-
-echo "✅ Finished sending all logs."
-</code></pre>
-
-<h3>۳. اجرای تست</h3>
-
-<pre><code>chmod +x simulate_logs.sh
+<pre><code>cp ../logmorph/simulate_logs.sh .
+chmod +x simulate_logs.sh
 ./simulate_logs.sh
 </code></pre>
+
+<p>توجه کنید مسیر <code>../logmorph/simulate_logs.sh</code> باید با مسیر واقعی فایل شما هماهنگ باشد.</p>
 
 <hr>
 
