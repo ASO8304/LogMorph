@@ -22,8 +22,9 @@
 <pre><code>sudo apt update
 sudo apt install postgresql postgresql-contrib
 sudo -u postgres psql
-CREATE DATABASE logdb;
-CREATE USER &lt;username&gt; WITH PASSWORD '&lt;username&gt;';
+</code></pre>
+<pre><code>CREATE DATABASE logdb;
+CREATE USER &lt;username&gt; WITH PASSWORD &lt;username&gt;;
 GRANT ALL PRIVILEGES ON DATABASE logdb TO &lt;username&gt;;
 \q
 </code></pre>
@@ -32,7 +33,7 @@ GRANT ALL PRIVILEGES ON DATABASE logdb TO &lt;username&gt;;
 <pre><code>sudo apt install logstash</code></pre>
 
 <h3>۳. نصب FastAPI و پکیج‌های مورد نیاز</h3>
-<pre><code>pip install fastapi uvicorn sqlalchemy psycopg2</code></pre>
+<pre><code>pip install fastapi uvicorn[standard] sqlalchemy psycopg2</code></pre>
 
 <h3>۴. ساخت فایل <code>app.py</code></h3>
 <p>در دایرکتوری پروژه، فایلی به نام <code>app.py</code> بسازید و کد FastAPI را در آن قرار دهید. (کدی که لاگ‌ها را در دیتابیس ذخیره می‌کند)</p>
@@ -47,20 +48,13 @@ GRANT ALL PRIVILEGES ON DATABASE logdb TO &lt;username&gt;;
 <h3>۱. کپی فایل کانفیگ از دایرکتوری پروژه</h3>
 
 <p style="font-family: Vazirmatn, sans-serif;">
-پس از کلون کردن مخزن پروژه، فایلی به نام <code>logs.conf</code> در پوشه پروژه موجود است. با دستور زیر، آن را به مسیر مناسب در Logstash کپی کنید:
+پس از کلون کردن مخزن پروژه، فایلی به نام <code>logmorph.conf</code> در پوشه پروژه موجود است. با دستور زیر، آن را به مسیر مناسب در Logstash کپی کنید:
 </p>
 
 <pre><code>
-sudo cp logs.conf /etc/logstash/conf.d/
+sudo cp logmorph.conf /etc/logstash/conf.d/
 </code></pre>
 
-<p style="font-family: Vazirmatn, sans-serif;">
-اگر فایل شما در مسیر خاصی مثل <code>~/log-ingestor/logs.conf</code> قرار دارد، دستور را به شکل زیر اجرا کنید:
-</p>
-
-<pre><code>
-sudo cp ~/log-ingestor/logs.conf /etc/logstash/conf.d/
-</code></pre>
 
 <h3>۲. اجرای Logstash</h3>
 <pre><code>
@@ -139,6 +133,3 @@ psql -U &lt;username&gt; -d logdb -c "SELECT * FROM logs ORDER BY id DESC LIMIT 
 
 <hr>
 
-<p style="font-family: Vazirmatn, sans-serif; font-style: italic; color: #34495e;">
-📌 طراحی شده برای محیط‌های سبک، قابل گسترش، و تست‌پذیر — توسط شما ❤️
-</p>
