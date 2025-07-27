@@ -20,49 +20,88 @@
 
 <h3 style="font-family: Vazirmatn, sans-serif;">۱. نصب PostgreSQL و تنظیمات اولیه</h3>
 
+<p style="font-family: Vazirmatn, sans-serif;">
+ابتدا سیستم را به‌روز کنید و PostgreSQL را نصب کنید:
+</p>
 <pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
-# به‌روزرسانی لیست بسته‌ها و نصب PostgreSQL
 sudo apt update
 sudo apt install postgresql postgresql-contrib
+</pre>
 
-# فعال‌سازی سرویس PostgreSQL در بوت سیستم و راه‌اندازی آن
+<p style="font-family: Vazirmatn, sans-serif;">
+برای فعال‌سازی سرویس PostgreSQL در هنگام روشن شدن سیستم و اجرای آن، دستورات زیر را اجرا کنید:
+</p>
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
 sudo systemctl enable postgresql
 sudo systemctl start postgresql
+</pre>
 
-# ورود به کاربر postgres برای مدیریت دیتابیس
+<p style="font-family: Vazirmatn, sans-serif;">
+برای مدیریت دیتابیس، وارد کاربر postgres شوید:
+</p>
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
 sudo -i -u postgres
+</pre>
 
-# باز کردن شل PostgreSQL
+<p style="font-family: Vazirmatn, sans-serif;">
+حالا وارد محیط psql شوید تا دیتابیس و کاربر بسازید:
+</p>
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
 psql
+</pre>
 
-# داخل محیط psql، ابتدا یوزر و سپس دیتابیس بسازید:
+<p style="font-family: Vazirmatn, sans-serif;">
+در محیط psql، دستورات زیر را برای ساخت کاربر و دیتابیس وارد کنید (مقادیر <code>&lt;username&gt;</code> و <code>&lt;password&gt;</code> را با مقادیر دلخواه خود جایگزین کنید):
+</p>
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
 CREATE USER &lt;username&gt; WITH ENCRYPTED PASSWORD '&lt;password&gt;';
 CREATE DATABASE logdb OWNER &lt;username&gt;;
 GRANT ALL PRIVILEGES ON DATABASE logdb TO &lt;username&gt;;
-
-# خروج از محیط psql
-\q
-
-# بازگشت به یوزر عادی
-exit
-
-# --- اجازه اتصال از راه دور (اختیاری) ---
-# ویرایش فایل پیکربندی postgresql.conf برای فعال‌کردن اتصال ریموت
-sudo vim /etc/postgresql/*/main/postgresql.conf
-
-# خط زیر را پیدا کرده و علامت # را حذف کرده یا مقدار آن را به '*' تغییر دهید
-listen_addresses = '*'
-
-# ویرایش فایل pg_hba.conf برای تعریف دسترسی‌ها
-sudo vim /etc/postgresql/*/main/pg_hba.conf
-
-# افزودن خط زیر به انتهای فایل برای اجازه دادن به همه IP ها با رمز عبور
-host    all             all             0.0.0.0/0               md5
-
-# راه‌اندازی مجدد PostgreSQL برای اعمال تغییرات
-sudo systemctl restart postgresql
 </pre>
 
+<p style="font-family: Vazirmatn, sans-serif;">
+برای خروج از محیط psql دستور زیر را بزنید:
+</p>
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
+\q
+</pre>
+
+<p style="font-family: Vazirmatn, sans-serif;">
+و سپس برای خروج از کاربر postgres به کاربر عادی خود بازگردید:
+</p>
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
+exit
+</pre>
+
+<h4 style="font-family: Vazirmatn, sans-serif;">اجازه اتصال از راه دور (اختیاری)</h4>
+
+<p style="font-family: Vazirmatn, sans-serif;">
+برای فعال‌کردن اتصال از راه دور، فایل پیکربندی <code>postgresql.conf</code> را ویرایش کنید:
+</p>
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
+sudo vim /etc/postgresql/*/main/postgresql.conf
+</pre>
+
+<p style="font-family: Vazirmatn, sans-serif;">
+خط <code>listen_addresses</code> را پیدا کرده و مقدار آن را به <code>'*'</code> تغییر دهید یا از حالت کامنت خارج کنید:
+</p>
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
+listen_addresses = '*'
+</pre>
+
+<p style="font-family: Vazirmatn, sans-serif;">
+سپس فایل <code>pg_hba.conf</code> را ویرایش کرده و خط زیر را به انتهای فایل اضافه کنید تا اتصال از هر IP با رمز عبور مجاز شود:
+</p>
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
+host    all             all             0.0.0.0/0               md5
+</pre>
+
+<p style="font-family: Vazirmatn, sans-serif;">
+در نهایت PostgreSQL را ریستارت کنید تا تنظیمات اعمال شوند:
+</p>
+<pre style="font-family: 'Courier New', monospace; background-color: #f6f8fa; padding: 15px; border-radius: 8px; overflow-x: auto;">
+sudo systemctl restart postgresql
+</pre>
 
 <h3>۲. نصب Logstash</h3>
 <pre><code>sudo apt install logstash</code></pre>
