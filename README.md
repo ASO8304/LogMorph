@@ -18,16 +18,50 @@
 
 <h2 style="font-family: Vazirmatn, sans-serif;">📦 نصب و راه‌اندازی</h2>
 
-<h3>۱. نصب PostgreSQL</h3>
-<pre><code>sudo apt update
+<h3>۱. نصب PostgreSQL و تنظیمات اولیه</h3>
+<pre><code>
+# به‌روزرسانی لیست بسته‌ها و نصب PostgreSQL
+sudo apt update
 sudo apt install postgresql postgresql-contrib
-sudo -u postgres psql
-</code></pre>
-<pre><code>CREATE DATABASE logdb;
-CREATE USER &lt;username&gt; WITH PASSWORD '&lt;username&gt;';
+
+# فعال‌سازی سرویس PostgreSQL در بوت سیستم و راه‌اندازی آن
+sudo systemctl enable postgresql
+sudo systemctl start postgresql
+
+# ورود به کاربر postgres برای مدیریت دیتابیس
+sudo -i -u postgres
+
+# باز کردن شل PostgreSQL
+psql
+
+# داخل محیط psql، ابتدا یوزر و سپس دیتابیس بسازید:
+CREATE USER &lt;username&gt; WITH ENCRYPTED PASSWORD '&lt;password&gt;';
+CREATE DATABASE logdb OWNER &lt;username&gt;;
 GRANT ALL PRIVILEGES ON DATABASE logdb TO &lt;username&gt;;
+
+# خروج از محیط psql
 \q
+
+# بازگشت به یوزر عادی
+exit
+
+# --- اجازه اتصال از راه دور (اختیاری) ---
+# ویرایش فایل پیکربندی postgresql.conf برای فعال‌کردن اتصال ریموت
+sudo vim /etc/postgresql/*/main/postgresql.conf
+
+# خط زیر را پیدا کرده و حذف علامت # کنید یا مقدار آن را به '*' تغییر دهید
+listen_addresses = '*'
+
+# ویرایش فایل pg_hba.conf برای تعریف دسترسی‌ها
+sudo vim /etc/postgresql/*/main/pg_hba.conf
+
+# افزودن خط زیر به انتهای فایل برای اجازه دادن به همه IP ها با رمز عبور
+host    all             all             0.0.0.0/0               md5
+
+# راه‌اندازی مجدد PostgreSQL برای اعمال تغییرات
+sudo systemctl restart postgresql
 </code></pre>
+
 
 <h3>۲. نصب Logstash</h3>
 <pre><code>sudo apt install logstash</code></pre>
