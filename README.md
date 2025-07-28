@@ -11,7 +11,7 @@
   <li>Ubuntu 20.04 یا جدیدتر</li>
   <li>Python 3.10+</li>
   <li>PostgreSQL</li>
-  <li>curl / wget</li>
+  <li>wget / curl</li>
 </ul>
 
 <hr>
@@ -35,11 +35,25 @@ GRANT ALL PRIVILEGES ON DATABASE logdb TO aso;
 exit
 </code></pre>
 
+<h4>فعال‌سازی اتصال از راه دور به PostgreSQL:</h4>
+<p>۱. ویرایش فایل پیکربندی PostgreSQL برای اجازه اتصال از آدرس‌های غیرمحلی:</p>
+<pre><code>sudo nano /etc/postgresql/14/main/postgresql.conf</code></pre>
+<p>یا به‌صورت کلی (برای هر نسخه):</p>
+<pre><code>sudo nano /etc/postgresql/*/main/postgresql.conf</code></pre>
+<p>و مقدار زیر را پیدا کرده و تغییر دهید:</p>
+<pre><code>listen_addresses = '*'</code></pre>
+
+<p>۲. ویرایش فایل pg_hba.conf برای اجازه به همه آی‌پی‌ها:</p>
+<pre><code>sudo nano /etc/postgresql/*/main/pg_hba.conf</code></pre>
+<p>و خط زیر را به انتهای فایل اضافه کنید:</p>
+<pre><code>host    all             all             0.0.0.0/0               md5</code></pre>
+
+<p>۳. سپس PostgreSQL را ری‌استارت کنید:</p>
+<pre><code>sudo systemctl restart postgresql</code></pre>
+
 <hr>
 
 <h3>۲. نصب Logstash به‌صورت دستی (نسخه 9.0.4)</h3>
-
-<p>برای کنترل بیشتر و عملکرد پایدار، Logstash از فایل فشرده رسمی نصب می‌شود:</p>
 <pre><code>
 wget https://artifacts.elastic.co/downloads/logstash/logstash-9.0.4-linux-x86_64.tar.gz
 sudo tar -xzf logstash-9.0.4-linux-x86_64.tar.gz -C /opt
@@ -62,8 +76,8 @@ After=network.target
 [Service]
 ExecStart=/opt/logstash/bin/logstash -f /opt/logstash/config/conf.d/logstash.conf
 Restart=always
-User=YOUR_USER
-Group=YOUR_USER
+User=YOUR_USERNAME
+Group=YOUR_USERNAME
 WorkingDirectory=/opt/logstash
 StandardOutput=journal
 StandardError=journal
@@ -73,7 +87,6 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 </code></pre>
 
-<p>سپس:</p>
 <pre><code>
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
@@ -102,7 +115,7 @@ pip install -r requirements.txt
 <h2 style="font-family: Vazirmatn, sans-serif;">🚀 ارسال لاگ آزمایشی</h2>
 
 <h3>۱. ساخت فایل لاگ نمونه</h3>
-<p>فایلی به نام <code>mylogs.txt</code> بسازید و لاگ‌های دلخواه را در آن قرار دهید.</p>
+<p>فایلی به نام <code>mylogs.txt</code> بسازید و لاگ‌های نمونه را در آن قرار دهید.</p>
 
 <h3>۲. اجرای اسکریپت ارسال لاگ</h3>
 <pre><code>
@@ -111,31 +124,31 @@ chmod +x send_logs.sh
 ./send_logs.sh
 </code></pre>
 
-<p>این اسکریپت لاگ‌ها را با فاصله 0.1 ثانیه از طریق UDP به Logstash ارسال می‌کند.</p>
+<p>این اسکریپت لاگ‌ها را با تاخیر 0.01 ثانیه‌ای از طریق UDP به Logstash ارسال می‌کند.</p>
 
 <hr>
 
 <h2 style="font-family: Vazirmatn, sans-serif;">🧾 مشاهده لاگ‌ها در دیتابیس</h2>
-
 <pre><code>psql -U aso -d logdb -c "SELECT * FROM logs ORDER BY id DESC LIMIT 10;"</code></pre>
 
 <hr>
 
 <h2 style="font-family: Vazirmatn, sans-serif;">🔍 بررسی لاگ‌ها و سرویس‌ها</h2>
 
-<h4>لاگ‌های Logstash:</h4>
+<h4>مشاهده لاگ سرویس Logstash:</h4>
 <pre><code>journalctl -u logstash -f</code></pre>
 
-<h4>لاگ‌های FastAPI (زمان اجرا):</h4>
+<h4>اجرای دستی FastAPI با مشاهده لاگ‌ها:</h4>
 <pre><code>uvicorn app:app --reload --host 0.0.0.0 --port 10000</code></pre>
 
 <hr>
 
 <h2 style="font-family: Vazirmatn, sans-serif;">📌 نکات تکمیلی</h2>
 <ul style="font-family: Vazirmatn, sans-serif;">
-  <li>اطمینان حاصل کنید FastAPI قبل از Logstash اجرا شده باشد.</li>
-  <li>پورت UDP در Logstash را می‌توانید در فایل <code>logstash.conf</code> تغییر دهید.</li>
-  <li>آدرس مقصد HTTP در خروجی Logstash باید با آدرس سرور FastAPI هماهنگ باشد.</li>
-  <li>از محیط مجازی پایتون استفاده کنید تا از تداخل پکیج‌ها جلوگیری شود.</li>
-  <li>برای امنیت بیشتر، از کلید API در ورودی FastAPI استفاده کنید.</li>
+  <li>قبل از اجرای Logstash، مطمئن شوید FastAPI با uvicorn اجرا شده است.</li>
+  <li>در صورت نیاز، پورت UDP در فایل logstash.conf قابل تغییر است.</li>
+  <li>آدرس FastAPI در خروجی Logstash باید دقیقاً با مقصد هماهنگ باشد.</li>
+  <li>از محیط مجازی Python استفاده کنید تا از تداخل پکیج‌ها جلوگیری شود.</li>
+  <li>برای امنیت، امکان افزودن کلید API به FastAPI وجود دارد.</li>
+  <li>برای اتصال از راه دور به PostgreSQL، تنظیمات listen_addresses و pg_hba.conf باید انجام شود (در بالا توضیح داده شد).</li>
 </ul>
