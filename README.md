@@ -1,4 +1,4 @@
-<h1 style="font-family: Vazirmatn, sans-serif; color: #2c3e50;">📊 سیستم پردازش لاگ LogMorph با Logstash و FastAPI</h1>
+<h1 style="font-family: Vazirmatn, sans-serif; color: #2c3e50;">📊 سیستم پردازش لاگ LogMorph با استفاده از Logstash و FastAPI</h1>
 
 <p style="font-family: Vazirmatn, sans-serif; font-size: 16px;">
 این پروژه، یک سیستم سریع و سبک برای دریافت لاگ‌ها از طریق <strong>UDP</strong>، پردازش با <strong>Logstash</strong> و ذخیره در <strong>PostgreSQL</strong> از طریق <strong>FastAPI</strong> است.
