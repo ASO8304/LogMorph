@@ -1,10 +1,19 @@
 # ——— Import required libraries ———
-from fastapi import FastAPI, Request, HTTPException           # FastAPI for creating REST API
+from fastapi import FastAPI, Request, HTTPException             # FastAPI for creating REST API
 from sqlalchemy import create_engine, Column, Integer, String, DateTime  # SQLAlchemy for database ORM
-from sqlalchemy.dialects.postgresql import JSONB             # PostgreSQL-specific JSONB type (not used here)
-from sqlalchemy.orm import declarative_base, sessionmaker    # SQLAlchemy base and session
-from datetime import datetime                                # Used for timestamping logs
-import logging                                                # For logging events and errors
+from sqlalchemy.orm import declarative_base, sessionmaker       # ORM base and session maker
+from datetime import datetime                                   # Timestamping logs
+import logging                                                  # For internal logging
+import os                                                       # To access environment variables
+from dotenv import load_dotenv                                  # Load variables from .env file
+
+# ——— Load environment variables from .env file ———
+load_dotenv()
+
+# ——— Read the database URL from environment variables ———
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("❌ DATABASE_URL is not set in .env or environment variables.")
 
 # ——— Set up basic logging configuration ———
 logging.basicConfig(
@@ -15,63 +24,66 @@ logging.basicConfig(
 # ——— Initialize FastAPI application ———
 app = FastAPI()
 
-# ——— PostgreSQL database connection setup ———
-DATABASE_URL = "postgresql://aso:aso@localhost:5432/logdb"
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)     # Create connection engine with ping check
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)  # Session for DB interaction
-Base = declarative_base()                                    # Base class for ORM models
+# ——— Set up PostgreSQL connection and ORM base ———
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)         # Create database engine
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)  # DB session factory
+Base = declarative_base()                                        # Base class for ORM models
 
-# ——— Define log table model ———
+# ——— Define the log table model ———
 class Log(Base):
     __tablename__ = "logs"
 
-    id              = Column(Integer, primary_key=True, index=True)   # Primary key
-    timestamp       = Column(DateTime, nullable=False)                # Server-side timestamp
-    in_mac          = Column(String)                                  # Incoming MAC address
-    out_mac         = Column(String)                                  # Outgoing MAC address
-    direction       = Column(String)                                  # Direction of traffic (in/out)
-    length          = Column(Integer)                                 # Packet length
-    protocol        = Column(Integer)                                 # Protocol ID (e.g., TCP=6, UDP=17)
-    src_ip          = Column(String)                                  # Source IP address
-    dst_ip          = Column(String)                                  # Destination IP address
-    src_port        = Column(Integer)                                 # Source port number
-    dst_port        = Column(Integer)                                 # Destination port number
-    description     = Column(String)                                  # Optional description field
+    id          = Column(Integer, primary_key=True, index=True)  # Auto-incremented primary key
+    timestamp   = Column(DateTime, nullable=False)               # Timestamp (UTC)
+    in_mac      = Column(String)                                 # Incoming MAC address
+    out_mac     = Column(String)                                 # Outgoing MAC address
+    direction   = Column(String)                                 # Traffic direction (in/out)
+    length      = Column(Integer)                                # Packet length
+    protocol    = Column(Integer)                                # Protocol type (e.g., TCP = 6)
+    src_ip      = Column(String)                                 # Source IP
+    dst_ip      = Column(String)                                 # Destination IP
+    src_port    = Column(Integer)                                # Source port
+    dst_port    = Column(Integer)                                # Destination port
+    description = Column(String)                                 # Optional description or detail
 
-# ——— Create the logs table in the database (if it doesn’t exist) ———
+# ——— Automatically create the table if it doesn't exist ———
 Base.metadata.create_all(bind=engine)
 
-# ——— Event hook for application startup ———
+# ——— Event hook: runs on FastAPI startup ———
 @app.on_event("startup")
 def on_startup():
-    logging.info("🚀 FastAPI up and running on port 10000")
+    logging.info("🚀 FastAPI server started on port 10000")
 
-# ——— Endpoint for receiving log data ———
+# ——— Endpoint to receive logs via HTTP POST ———
 @app.post("/logs")
 async def receive_logs(request: Request):
     try:
-        # Try to parse the JSON payload from the incoming HTTP request
+        # Parse incoming JSON payload
         payload = await request.json()
     except Exception as e:
         logging.error("Invalid JSON: %s", e)
-        raise HTTPException(400, "Invalid JSON payload")  # Respond with 400 if JSON is malformed
+        raise HTTPException(400, "Invalid JSON payload")
 
-    # Ensure entries is a list of log objects
+    # Ensure it's a list of log entries
     entries = payload if isinstance(payload, list) else [payload]
 
-    # Start a new database session
+    # Open a new DB session
     db = SessionLocal()
-    inserted = skipped = errors = 0  # Counters for reporting
+    inserted = skipped = errors = 0
 
-    # Process each entry in the list
     for entry in entries:
-        logging.debug("Entry: %s", entry)
-
-        # Timestamp the entry with server's current UTC time
+        logging.debug("Processing entry: %s", entry)
         ts = datetime.utcnow()
 
+        # Optional: skip entries missing critical fields
+        required_fields = ["in_mac", "out_mac", "dir", "len", "proto", "src_ip", "dst_ip", "src_port", "dst_port"]
+        if not all(entry.get(field) is not None for field in required_fields):
+            skipped += 1
+            logging.warning("❗ Skipped incomplete log entry: %s", entry)
+            continue
+
         try:
-            # Map log fields from the incoming JSON
+            # Create a Log object from the entry
             log = Log(
                 timestamp   = ts,
                 in_mac      = entry.get("in_mac"),
@@ -83,25 +95,31 @@ async def receive_logs(request: Request):
                 dst_ip      = entry.get("dst_ip"),
                 src_port    = entry.get("src_port"),
                 dst_port    = entry.get("dst_port"),
-                description = entry.get("description") or {}
+                description = str(entry.get("description") or "")  # Convert to string to avoid type errors
             )
-            db.add(log)      # Add the log object to session
+            db.add(log)
             inserted += 1
         except Exception as e:
             errors += 1
-            logging.error("Insert error: %s → %s", e, entry)
+            logging.error("⚠️ Error inserting entry: %s → %s", e, entry)
 
-    # Attempt to commit all inserted logs to the database
+    # Commit all successful inserts
     if inserted:
         try:
             db.commit()
-            logging.info("Inserted %d rows", inserted)
+            logging.info("✅ Inserted %d rows", inserted)
         except Exception as e:
-            db.rollback()  # Roll back if commit fails
-            logging.error("DB commit failed: %s", e)
-            raise HTTPException(500, "DB commit failed")
+            db.rollback()
+            logging.error("❌ Database commit failed: %s", e)
+            raise HTTPException(500, "Database commit failed")
 
-    db.close()  # Always close DB session
+    # Always close DB session
+    db.close()
 
-    # Return the final result as JSON
-    return {"status": "ok", "inserted": inserted, "skipped": skipped, "errors": errors}
+    # Return operation summary
+    return {
+        "status": "ok",
+        "inserted": inserted,
+        "skipped": skipped,
+        "errors": errors
+    }
