@@ -7,12 +7,21 @@
 <hr>
 
 <h2 style="font-family: Vazirmatn, sans-serif;">🔧 پیش‌نیازها</h2>
-<ul style="font-family: Vazirmatn, sans-serif;">
-  <li>Ubuntu 20.04 یا جدیدتر</li>
-  <li>Python 3.10+</li>
-  <li>PostgreSQL</li>
-  <li>wget / curl</li>
+<ul style="font-family: Vazirmatn, sans-serif; font-size: 16px;">
+  <li>سیستم‌عامل <strong>Ubuntu 20.04 یا جدیدتر</strong></li>
+  <li>دسترسی به ترمینال با <strong>دسترسی sudo</strong></li>
+  <li><strong>Python 3.10+</strong> به‌همراه ماژول <code>venv</code></li>
+  <li><strong>pip</strong> برای مدیریت پکیج‌های پایتون</li>
+  <li><strong>PostgreSQL 12+</strong> برای ذخیره‌سازی لاگ‌ها</li>
+  <li><strong>wget</strong> یا <strong>curl</strong> برای دریافت فایل‌ها از اینترنت</li>
+  <li><strong>tar</strong> برای استخراج فایل Logstash</li>
+  <li><strong>systemd</strong> برای مدیریت سرویس Logstash (در اکثر نسخه‌های Ubuntu موجود است)</li>
+  <li><strong>socat</strong> (برای ارسال لاگ‌های تستی از طریق UDP)</li>
 </ul>
+
+<p style="font-family: Vazirmatn, sans-serif; font-size: 15px;">
+در صورت نبود هر یک از ابزارها، اسکریپت نصب به‌صورت خودکار آن را نصب می‌کند. با این حال بهتر است قبل از اجرای اسکریپت‌ها، سیستم به‌روز و آماده باشد.
+</p>
 
 <hr>
 
