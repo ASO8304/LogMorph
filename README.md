@@ -8,14 +8,10 @@
 
 <h2 style="font-family: Vazirmatn, sans-serif;">🔧 پیش‌نیازها</h2>
 <ul style="font-family: Vazirmatn, sans-serif; font-size: 16px;">
-  <li>سیستم‌عامل <strong>Ubuntu 20.04 یا جدیدتر</strong></li>
-  <li>دسترسی به ترمینال با <strong>دسترسی sudo</strong></li>
+  <li>Ubuntu 20.04+</strong></li>
   <li><strong>Python 3.10+</strong> به‌همراه ماژول <code>venv</code></li>
-  <li><strong>pip</strong> برای مدیریت پکیج‌های پایتون</li>
-  <li><strong>PostgreSQL 12+</strong> برای ذخیره‌سازی لاگ‌ها</li>
-  <li><strong>wget</strong> یا <strong>curl</strong> برای دریافت فایل‌ها از اینترنت</li>
-  <li><strong>tar</strong> برای استخراج فایل Logstash</li>
-  <li><strong>systemd</strong> برای مدیریت سرویس Logstash (در اکثر نسخه‌های Ubuntu موجود است)</li>
+  <li><strong>pip</li>
+  <li><strong>PostgreSQL 12+</li>
   <li><strong>socat</strong> (برای ارسال لاگ‌های تستی از طریق UDP)</li>
 </ul>
 
