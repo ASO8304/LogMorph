@@ -105,6 +105,8 @@ pip install -r requirements.txt
 </code></pre>
 
 <h4>ساخت فایل <code>.env</code></h4>
+<pre><code>DATABASE_URL=postgresql://&ltusername>:&ltpassword&gt@&ltpostgres_ip&gt:&ltpostgres_port&gt/&ltdatabse_name></code></pre>
+<p> مثال: </p>
 <pre><code>DATABASE_URL=postgresql://aso:aso@localhost:5432/logdb</code></pre>
 
 <h4>اجرای FastAPI</h4>
