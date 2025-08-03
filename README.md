@@ -113,13 +113,33 @@ exit
 </ul>
 
 <h4>🔐 Configure Environment Variables</h4>
-<p>The FastAPI application (<code>app.py</code>) automatically loads the database connection string from a <code>.env</code> file using <code>python-dotenv</code>. This file must be located in the <strong>project root directory</strong>.</p>
 
-<p>Create or edit <code>.env</code> with the following content, replacing values as needed:</p>
+<p>
+  The FastAPI application (<code>app.py</code>) loads the database connection string from a
+  <code>.env</code> file using <code>python-dotenv</code>.
+</p>
+
+<p>
+  By default, this file should be located at:
+  <code>/opt/fastapi/.env</code>
+</p>
+
+<p>
+  To edit the file, run:
+</p>
+<pre><code>sudo nano /opt/fastapi/.env</code></pre>
+
+<p>
+  Add or update the following line with your PostgreSQL credentials:
+</p>
 <pre><code>DATABASE_URL=postgresql://&lt;username&gt;:&lt;password&gt;@&lt;postgres_ip&gt;:&lt;postgres_port&gt;/&lt;database_name&gt;</code></pre>
 
 <p>Example:</p>
 <pre><code>DATABASE_URL=postgresql://aso:aso@localhost:5432/logdb</code></pre>
+
+<p>
+  Make sure this file exists and is readable by the FastAPI system user (default: <code>fastapi</code>).
+</p>
 
 <hr>
 
