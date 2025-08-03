@@ -41,7 +41,7 @@ fi
 # --- Copy project to /opt/fastapi ---
 echo "📁 Installing FastAPI app to $INSTALL_DIR..."
 sudo mkdir -p "$INSTALL_DIR"
-sudo rsync -a --exclude venv ./ "$INSTALL_DIR/"
+sudo rsync -a --exclude venv ../ "$INSTALL_DIR/"
 sudo chown -R $FASTAPI_USER:$FASTAPI_USER "$INSTALL_DIR"
 
 # --- Create virtual environment ---
