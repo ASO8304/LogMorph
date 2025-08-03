@@ -1,9 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>📊 LogMorph Log Processing System</title>
-</head>
 <body style="font-family: Arial, sans-serif; color: #2c3e50; line-height: 1.6;">
 
 <h1>📊 LogMorph Log Processing System with Logstash and FastAPI</h1>
