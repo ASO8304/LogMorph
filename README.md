@@ -2,9 +2,9 @@
 <html lang="en">
 <body style="font-family: Arial, sans-serif; color: #2c3e50; line-height: 1.6;">
 
-<h1>📊 LogMorph Log Processing System with Logstash and FastAPI</h1>
+<h1>LogMorph - Log Processing System with Logstash and FastAPI</h1>
 
-<p>This project is a fast and lightweight system for receiving logs via <strong>UDP</strong>, processing with <strong>Logstash</strong>, and storing them in <strong>PostgreSQL</strong> using <strong>FastAPI</strong>.</p>
+<p>This project is a fast and lightweight system for receiving logs via <strong>UDP</strong>, processing and parsing it with <strong>Logstash</strong>, and storing them in <strong>PostgreSQL</strong> using <strong>FastAPI</strong>.</p>
 
 <hr>
 
