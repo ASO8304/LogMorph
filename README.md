@@ -154,16 +154,6 @@ bash scripts/log_simulator.sh
 
 <hr>
 
-<h2>🔍 Check Logs and Services</h2>
-
-<h4>View Logstash logs:</h4>
-<pre><code>journalctl -u logstash -f</code></pre>
-
-<h4>Manually run FastAPI with logging:</h4>
-<pre><code>uvicorn app:app --reload --host 0.0.0.0 --port 10000</code></pre>
-
-<hr>
-
 <h2>📌 Additional Notes</h2>
 <ul>
   <li>Ensure FastAPI is running before Logstash.</li>
