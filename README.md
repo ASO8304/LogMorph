@@ -112,18 +112,14 @@ exit
   <li>Starts the FastAPI application on port <code>10000</code></li>
 </ul>
 
-<h4>🌐 Configure the database connection</h4>
-<p>Before running the FastAPI service, make sure to create a <code>.env</code> file in the project root with your database URL:</p>
+<h4>🔐 Configure Environment Variables</h4>
+<p>The FastAPI application (<code>app.py</code>) automatically loads the database connection string from a <code>.env</code> file using <code>python-dotenv</code>. This file must be located in the <strong>project root directory</strong>.</p>
+
+<p>Create or edit <code>.env</code> with the following content, replacing values as needed:</p>
 <pre><code>DATABASE_URL=postgresql://&lt;username&gt;:&lt;password&gt;@&lt;postgres_ip&gt;:&lt;postgres_port&gt;/&lt;database_name&gt;</code></pre>
+
 <p>Example:</p>
 <pre><code>DATABASE_URL=postgresql://aso:aso@localhost:5432/logdb</code></pre>
-
-<h4>📡 Monitor FastAPI Logs</h4>
-<p>To view FastAPI logs in real-time:</p>
-<pre><code>journalctl -u fastapi.service -f</code></pre>
-
-<p>To check the status of the FastAPI service:</p>
-<pre><code>systemctl status fastapi.service</code></pre>
 
 <hr>
 
