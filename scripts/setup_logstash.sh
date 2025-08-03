@@ -15,7 +15,7 @@ LOGSTASH_SYMLINK="/opt/logstash"
 LOGSTASH_CONF_SRC="logstash/logstash.conf"
 LOGSTASH_CONF_DEST="$LOGSTASH_SYMLINK/config/conf.d/logstash.conf"
 SYSTEMD_UNIT_PATH="/etc/systemd/system/logstash.service"
-REQUIRED_TOOLS=("wget" "tar" "curl" "openjdk-11-jdk")
+REQUIRED_TOOLS=("wget" "tar" "curl")
 
 echo "📦 Setting up Logstash..."
 
@@ -43,11 +43,6 @@ for pkg in "${REQUIRED_TOOLS[@]}"; do
     echo "✅ $pkg is installed."
   fi
 done
-
-# --- Detect JAVA_HOME ---
-JAVA_BIN=$(readlink -f $(which java))
-JAVA_HOME=$(dirname $(dirname "$JAVA_BIN"))
-echo "🧠 Detected JAVA_HOME: $JAVA_HOME"
 
 # --- Download Logstash ---
 if [ ! -f "$LOGSTASH_TARBALL" ]; then
@@ -77,6 +72,18 @@ echo "📝 Copying config..."
 sudo mkdir -p "$LOGSTASH_SYMLINK/config/conf.d"
 sudo cp "$LOGSTASH_CONF_SRC" "$LOGSTASH_CONF_DEST"
 
+# --- Create logstash user ---
+if ! id "logstash" &>/dev/null; then
+  echo "👤 Creating system user: logstash"
+  sudo useradd --system --no-create-home --shell /usr/sbin/nologin logstash
+else
+  echo "✅ User 'logstash' already exists."
+fi
+
+# --- Set permissions ---
+echo "🔐 Setting ownership to logstash user..."
+sudo chown -R logstash:logstash "$LOGSTASH_INSTALL_DIR" "$LOGSTASH_SYMLINK"
+
 # --- Setup systemd ---
 if command -v systemctl >/dev/null 2>&1; then
   echo "🛠️ Setting up systemd service..."
@@ -88,10 +95,9 @@ After=network.target
 [Service]
 ExecStart=$LOGSTASH_SYMLINK/bin/logstash -f $LOGSTASH_CONF_DEST
 Restart=always
-User=$USER
-Group=$USER
+User=logstash
+Group=logstash
 WorkingDirectory=$LOGSTASH_SYMLINK
-Environment=LS_JAVA_HOME=$JAVA_HOME
 StandardOutput=journal
 StandardError=journal
 LimitNOFILE=65536
