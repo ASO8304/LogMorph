@@ -14,6 +14,7 @@ LOGSTASH_INSTALL_DIR="/opt/logstash-$LOGSTASH_VERSION"
 LOGSTASH_SYMLINK="/opt/logstash"
 LOGSTASH_CONF_SRC="../logstash/logstash.conf"
 LOGSTASH_CONF_DEST="$LOGSTASH_SYMLINK/config/conf.d/logstash.conf"
+LOGSTASH_CONF_DEST_DIR="/opt/logstash/config"
 SYSTEMD_UNIT_PATH="/etc/systemd/system/logstash.service"
 REQUIRED_TOOLS=("wget" "tar" "curl")
 

@@ -37,11 +37,13 @@ class Log(Base):
     timestamp   = Column(DateTime, nullable=False)               # Timestamp (UTC)
     in_mac      = Column(String)                                 # Incoming MAC address
     out_mac     = Column(String)                                 # Outgoing MAC address
-    direction   = Column(String)                                 # Traffic direction (in/out)
+    direction1  = Column(String)                                 # Traffic direction (in/out)
+    direction2  = Column(String)                                 # Traffic direction (in/out)
     length      = Column(Integer)                                # Packet length
     protocol    = Column(Integer)                                # Protocol type (e.g., TCP = 6)
     src_ip      = Column(String)                                 # Source IP
     dst_ip      = Column(String)                                 # Destination IP
+    df          = Column(String)                                 # Defragment/Fragment
     src_port    = Column(Integer)                                # Source port
     dst_port    = Column(Integer)                                # Destination port
     description = Column(String)                                 # Optional description or detail
@@ -73,10 +75,16 @@ async def receive_logs(request: Request):
 
     for entry in entries:
         logging.debug("Processing entry: %s", entry)
-        ts = datetime.utcnow()
+
+        ts_str = entry.get("timestamp")
+        try:
+            ts = datetime.strptime(ts_str, "%Y-%m-%d  %H:%M:%S.%f") if ts_str else datetime.utcnow()
+        except ValueError:
+            logging.warning("❗ Invalid timestamp format: %s", ts_str)
+            ts = datetime.utcnow()
 
         # Optional: skip entries missing critical fields
-        required_fields = ["in_mac", "out_mac", "dir", "len", "proto", "src_ip", "dst_ip", "src_port", "dst_port"]
+        required_fields = ["in_mac", "out_mac", "dir1", "dir2", "len", "proto", "src_ip", "dst_ip", "df", "src_port", "dst_port"]
         if not all(entry.get(field) is not None for field in required_fields):
             skipped += 1
             logging.warning("❗ Skipped incomplete log entry: %s", entry)
@@ -88,11 +96,13 @@ async def receive_logs(request: Request):
                 timestamp   = ts,
                 in_mac      = entry.get("in_mac"),
                 out_mac     = entry.get("out_mac"),
-                direction   = entry.get("dir"),
+                direction1  = entry.get("dir1"),
+                direction2  = entry.get("dir2"),
                 length      = entry.get("len"),
                 protocol    = entry.get("proto"),
                 src_ip      = entry.get("src_ip"),
                 dst_ip      = entry.get("dst_ip"),
+                df          = entry.get("df"),
                 src_port    = entry.get("src_port"),
                 dst_port    = entry.get("dst_port"),
                 description = str(entry.get("description") or "")  # Convert to string to avoid type errors
